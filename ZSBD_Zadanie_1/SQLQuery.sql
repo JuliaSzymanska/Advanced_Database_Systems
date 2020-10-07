@@ -39,7 +39,7 @@ GO
 SELECT nazwisko, DATEDIFF(year,  data_ur, GETDATE()) AS wiek FROM zawodnicy
 ORDER BY wiek DESC;
 
---8--
+--8--     ---------------- !!!!!!!!!!!!!!!!!!!!!!
 SELECT z.nazwisko, DATEDIFF(year, z.data_ur, zawody.DATA) FROM zawody, zawodnicy z,  uczestnictwa_w_zawodach u
 WHERE z.id_skoczka = u.id_skoczka
 AND u.id_zawodow = zawody.id_zawodow
@@ -47,3 +47,7 @@ AND zawody.DATA IN (SELECT DATA FROM (SELECT z.id_skoczka, MIN(zawod.DATA) as DA
 							WHERE z.id_skoczka = uc.id_skoczka
 							AND uc.id_zawodow = zawod.id_zawodow GROUP BY zawod.DATA, z.id_skoczka) AS tab WHERE tab.id_skoczka = z.id_skoczka)
 ORDER BY z.nazwisko
+
+--9--
+SELECT nazwa, (sedz - k) as odl FROM skocznie
+ORDER BY odl DESC
