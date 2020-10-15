@@ -29,10 +29,11 @@ GROUP BY nieruchomoscnr
 GO
 
 --3--
-SELECT	n.nieruchomoscnr, CONVERT(VARCHAR, (n.czynsz * 100 / MIN(w.czynsz)) - 100) + '%' AS podwyzka
-FROM nieruchomosci n, wynajecia w
-WHERE n.nieruchomoscnr = w.nieruchomoscNr
-GROUP BY n.nieruchomoscnr, n.czynsz
+SELECT	n.nieruchomoscnr, CONVERT(VARCHAR, (n.czynsz * 100 / (
+				SELECT TOP 1 w.czynsz FROM biuro.dbo.wynajecia w 
+				WHERE w.nieruchomoscNr = n.nieruchomoscnr 
+				ORDER BY w.od_kiedy ASC)) - 100) + '%' AS podwyzka
+FROM nieruchomosci n
 GO
 
 --4--
@@ -47,7 +48,15 @@ WHERE w.nieruchomoscNr = n.nieruchomoscnr
 GROUP BY n.biuroNr
 GO
 
---6--
+--6A--
+SELECT b.miasto,  COUNT(*)  FROM nieruchomosci n, wynajecia w, biura b 
+WHERE n.biuroNr = b.biuroNr
+AND n.nieruchomoscnr = w.nieruchomoscNr
+GROUP BY b.miasto
+ORDER BY COUNT(*) DESC
+GO
+
+--6B--
 SELECT b.miasto,  SUM(DATEDIFF(day,  w.od_kiedy, w.do_kiedy))  FROM nieruchomosci n, wynajecia w, biura b 
 WHERE n.biuroNr = b.biuroNr
 AND n.nieruchomoscnr = w.nieruchomoscNr
@@ -56,22 +65,35 @@ ORDER BY  (SUM(DATEDIFF(day,  w.od_kiedy, w.do_kiedy))) DESC
 GO
 
 --7--
-SELECT wiz.klientnr, wiz.nieruchomoscnr FROM nieruchomosci n, wizyty wiz, wynajecia wyn
+SELECT DISTINCT wiz.klientnr, wiz.nieruchomoscnr FROM nieruchomosci, wizyty wiz, wynajecia wyn, klienci
 WHERE wiz.nieruchomoscnr = wyn.nieruchomoscNr
 AND wiz.klientnr = wyn.klientnr
-GROUP BY wiz.klientnr, wiz.nieruchomoscnr
 GO
 
---8-- ------ nie do koñca zgadza siê z danymi w tabeli pokazanymi w zadaniu, chyba z 2 czy 3 wartoœci
+--8--
 SELECT wiz.klientnr, COUNT(wiz.nieruchomoscnr) FROM wizyty wiz
 WHERE wiz.data_wizyty < (SELECT MIN(od_kiedy) FROM wynajecia WHERE klientnr = wiz.klientnr)
 GROUP BY wiz.klientnr
 ORDER BY wiz.klientnr
 GO
 
---9-- - chwilowo nie wiem o co chodzi
-
+--9--
+SELECT DISTINCT klienci.klientnr FROM klienci, wynajecia
+WHERE klienci.klientnr = wynajecia.klientnr
+AND klienci.max_czynsz < wynajecia.czynsz
 
 --10--
 SELECT biuroNr FROM biura
 WHERE biuroNr NOT IN (SELECT biuroNr FROM nieruchomosci)
+
+--11A--
+
+
+--11B--
+
+
+--11C--
+
+
+--11D--
+
