@@ -87,13 +87,68 @@ SELECT biuroNr FROM biura
 WHERE biuroNr NOT IN (SELECT biuroNr FROM nieruchomosci)
 
 --11A--
+SELECT  (SELECT COUNT(*) 
+		FROM personel
+		WHERE (plec = 'K')
+		) AS panie,
 
+		(SELECT COUNT(*) 
+		FROM personel
+		WHERE (plec = 'M')
+		) AS panowie
+GO
 
 --11B--
+SELECT DISTINCT	b.biuroNr, 
+				(SELECT COUNT(*) 
+				FROM personel
+				WHERE (plec = 'K')
+				AND b.biuroNr = biuroNr
+				) AS panie,
 
+				(SELECT COUNT(*) 
+				FROM personel
+				WHERE (plec = 'M')
+				AND b.biuroNr = biuroNr
+				) AS panowie
+FROM biura b, personel p
+WHERE b.biuroNr = p.biuroNr
+GO
 
 --11C--
+SELECT DISTINCT	miasto, 
+				(SELECT COUNT(*) 
+				FROM biura, personel
+				WHERE (plec = 'K')
+				AND biura.biuroNr = personel.biuroNr
+				AND biura.miasto = b.miasto
+				) AS panie,
 
+				(SELECT COUNT(*) 
+				FROM biura, personel
+				WHERE (plec = 'M')
+				AND biura.biuroNr = personel.biuroNr
+				AND biura.miasto = b.miasto
+				) AS panowie
+FROM biura b, personel p
+WHERE b.biuroNr = p.biuroNr
+GO
 
 --11D--
+SELECT DISTINCT	stanowisko, 
+				(SELECT COUNT(*) 
+				FROM biura, personel
+				WHERE (plec = 'K')
+				AND biura.biuroNr = personel.biuroNr
+				AND personel.stanowisko = p.stanowisko
+				) AS panie,
 
+				(SELECT COUNT(*) 
+				FROM biura, personel
+				WHERE (plec = 'M')
+				AND biura.biuroNr = personel.biuroNr
+				AND personel.stanowisko = p.stanowisko
+				) AS panowie
+FROM biura b, personel p
+WHERE b.biuroNr = p.biuroNr
+GO
