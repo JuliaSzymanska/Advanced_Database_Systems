@@ -57,11 +57,11 @@ ORDER BY COUNT(*) DESC
 GO
 
 --6B--
-SELECT b.miasto,  SUM(DATEDIFF(day,  w.od_kiedy, w.do_kiedy))  FROM nieruchomosci n, wynajecia w, biura b 
+SELECT b.miasto,  SUM(DATEDIFF(day,  w.od_kiedy, w.do_kiedy)) AS przychod FROM nieruchomosci n, wynajecia w, biura b 
 WHERE n.biuroNr = b.biuroNr
 AND n.nieruchomoscnr = w.nieruchomoscNr
 GROUP BY b.miasto
-ORDER BY  (SUM(DATEDIFF(day,  w.od_kiedy, w.do_kiedy))) DESC
+ORDER BY przychod DESC
 GO
 
 --7--
@@ -83,7 +83,7 @@ WHERE klienci.klientnr = wynajecia.klientnr
 AND klienci.max_czynsz < wynajecia.czynsz
 
 --10--
-SELECT biuroNr FROM biura
+SELECT DISTINCT biuroNr FROM biura
 WHERE biuroNr NOT IN (SELECT biuroNr FROM nieruchomosci)
 
 --11A--
@@ -97,6 +97,7 @@ SELECT  (SELECT COUNT(*)
 		WHERE (plec = 'M')
 		) AS panowie
 GO
+
 
 --11B--
 SELECT DISTINCT	b.biuroNr, 
