@@ -108,17 +108,14 @@ DEALLOCATE kursor
 DECLARE @liczba INT, @nr_del INT
 SET @liczba = 0
 DECLARE kursor_del CURSOR FOR
-SELECT nr_odd FROM oddzialy
+SELECT nr_odd FROM oddzialy WHERE nr_odd > 2
 OPEN kursor_del
 FETCH NEXT FROM kursor_del INTO @nr_del
 WHILE @@FETCH_STATUS = 0
 	BEGIN 
-		IF @nr_del > 2
-			BEGIN
-				DELETE FROM oddzialy WHERE CURRENT OF kursor_del
-				SET @liczba = @liczba + 1
-				PRINT 'Liczba usunietych rekordow: ' + CONVERT(VARCHAR, @liczba)
-			END
+		DELETE FROM oddzialy WHERE CURRENT OF kursor_del
+		SET @liczba = @liczba + 1
+		PRINT 'Liczba usunietych rekordow: ' + CONVERT(VARCHAR, @liczba)
 		FETCH NEXT FROM kursor_del INTO @nr_del
 	END
 CLOSE kursor_del
@@ -129,17 +126,14 @@ DECLARE @istnieje BIT, @nr_update INT, @nr_selected INT
 SET @nr_selected = 3
 SET @istnieje = 0
 DECLARE kursor_up CURSOR FOR
-	SELECT nr_odd FROM oddzialy
+	SELECT nr_odd FROM oddzialy WHERE nr_odd = @nr_selected
 BEGIN
 	OPEN kursor_up
 	FETCH NEXT FROM kursor_up INTO @nr_update
 	WHILE @@FETCH_STATUS = 0
 		BEGIN 
-			IF @nr_update = @nr_selected
-				BEGIN
-					UPDATE oddzialy SET nazwa_odd = 'Zmieniony' WHERE CURRENT OF kursor_up
-					SET @istnieje = 1
-				END	
+			UPDATE oddzialy SET nazwa_odd = 'Zmieniony' WHERE CURRENT OF kursor_up
+			SET @istnieje = 1
 			FETCH NEXT FROM kursor_up INTO @nr_update
 		END
 	CLOSE kursor_up
