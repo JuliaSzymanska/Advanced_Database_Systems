@@ -98,7 +98,7 @@ OPEN kursor
 FETCH NEXT FROM kursor INTO @nr, @nazwa
 WHILE @@FETCH_STATUS = 0
 	BEGIN 
-		PRINT 'Numer oddzialy to: ' + CONVERT(VARCHAR(2), @nr) + ', nazwa oddzialu to: ' + @nazwa	
+		PRINT 'Numer oddzialy to: ' + CONVERT(VARCHAR, @nr) + ', nazwa oddzialu to: ' + @nazwa	
 		FETCH NEXT FROM kursor INTO @nr, @nazwa
 	END
 CLOSE kursor
@@ -115,9 +115,9 @@ WHILE @@FETCH_STATUS = 0
 	BEGIN 
 		IF @nr_del > 2
 			BEGIN
-				DELETE FROM oddzialy WHERE nr_odd = @nr_del
+				DELETE FROM oddzialy WHERE CURRENT OF kursor_del
 				SET @liczba = @liczba + 1
-				PRINT 'Liczba usunietych rekordow: ' +  CONVERT(VARCHAR(2), @liczba)
+				PRINT 'Liczba usunietych rekordow: ' + CONVERT(VARCHAR, @liczba)
 			END
 		FETCH NEXT FROM kursor_del INTO @nr_del
 	END
@@ -137,7 +137,7 @@ BEGIN
 		BEGIN 
 			IF @nr_update = @nr_selected
 				BEGIN
-					UPDATE oddzialy SET nazwa_odd = 'Zmieniony' WHERE nr_odd = @nr_update
+					UPDATE oddzialy SET nazwa_odd = 'Zmieniony' WHERE CURRENT OF kursor_up
 					SET @istnieje = 1
 				END	
 			FETCH NEXT FROM kursor_up INTO @nr_update
