@@ -7,9 +7,8 @@ SET @text = 'Czesc, to ja'
 PRINT @text
 
 -- 2. --
-DECLARE @number INT
-SET @number = 8
-PRINT 'Zmienna = ' + CONVERT(VARCHAR(5), @number) +  CHAR(10)			-- CHAR(10) daje now¹ liniê
+DECLARE @number NUMERIC(4, 2) = 82.34
+PRINT 'Zmienna = ' + CAST(@number AS VARCHAR) +  CHAR(10)			-- CHAR(10) daje now¹ liniê
 GO
 
 -- 3. --
@@ -23,12 +22,10 @@ ELSE
 GO
 
 -- 4. --
-DECLARE @i INT
-SET @i = 1
-
+DECLARE @i INT = 1
 WHILE (@i < 5)
 	BEGIN
-		PRINT 'Zmienna ma wartosc ' + CONVERT(VARCHAR(1), @i)
+		PRINT 'Zmienna ma wartosc ' + CAST(@i AS CHAR)
 		SET @i = @i + 1
 	END
 GO
@@ -40,7 +37,7 @@ SET @j = 3
 WHILE (@j < 8)
 	BEGIN
 		IF(@j = 3)
-			PRINT CHAR(10) + 'poczatek'
+			PRINT 'poczatek'
 
 		IF (@j = 5)
 			PRINT 'srodek'
@@ -81,9 +78,7 @@ VALUES('6','Wysylka');
 GO
 
 -- 7. --
-DECLARE @id INT
-SET @id = 2
-DECLARE @name VARCHAR(20)
+DECLARE @id INT = 2, @name VARCHAR(20)
 BEGIN 
 	SET @name = (SELECT nazwa_odd FROM oddzialy
 				WHERE nr_odd = @id)
@@ -93,20 +88,21 @@ END
 -- 8. --
 DECLARE kursor CURSOR FOR
 SELECT * FROM oddzialy
-DECLARE @nazwa VARCHAR(20), @nr INT
-OPEN kursor
-FETCH NEXT FROM kursor INTO @nr, @nazwa
-WHILE @@FETCH_STATUS = 0
-	BEGIN 
-		PRINT 'Numer oddzialy to: ' + CONVERT(VARCHAR, @nr) + ', nazwa oddzialu to: ' + @nazwa	
-		FETCH NEXT FROM kursor INTO @nr, @nazwa
-	END
-CLOSE kursor
-DEALLOCATE kursor
+BEGIN
+	DECLARE @nazwa VARCHAR(20), @nr INT
+	OPEN kursor
+	FETCH NEXT FROM kursor INTO @nr, @nazwa
+	WHILE @@FETCH_STATUS = 0
+		BEGIN 
+			PRINT 'Numer oddzialy to: ' + CAST(@nr As VARCHAR) + ', nazwa oddzialu to: ' + @nazwa	
+			FETCH NEXT FROM kursor INTO @nr, @nazwa
+		END
+	CLOSE kursor
+	DEALLOCATE kursor
+END
 
 -- 9. --
-DECLARE @liczba INT, @nr_del INT
-SET @liczba = 0
+DECLARE @liczba INT = 0, @nr_del INT
 DECLARE kursor_del CURSOR FOR
 SELECT nr_odd FROM oddzialy WHERE nr_odd > 2
 OPEN kursor_del
@@ -115,16 +111,14 @@ WHILE @@FETCH_STATUS = 0
 	BEGIN 
 		DELETE FROM oddzialy WHERE CURRENT OF kursor_del
 		SET @liczba = @liczba + 1
-		PRINT 'Liczba usunietych rekordow: ' + CONVERT(VARCHAR, @liczba)
 		FETCH NEXT FROM kursor_del INTO @nr_del
 	END
 CLOSE kursor_del
 DEALLOCATE kursor_del
+PRINT 'Liczba usunietych rekordow: ' + CAST(@liczba AS VARCHAR)
 
 -- 10. --
-DECLARE @istnieje BIT, @nr_update INT, @nr_selected INT
-SET @nr_selected = 3
-SET @istnieje = 0
+DECLARE @istnieje BIT = 0, @nr_update INT, @nr_selected INT = 3
 DECLARE kursor_up CURSOR FOR
 	SELECT nr_odd FROM oddzialy WHERE nr_odd = @nr_selected
 BEGIN
